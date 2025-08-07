@@ -21,13 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-sew)_t!!zqaz37h8v0w4=&%a+2u_r=446=*^o#!%1-%v$l*c1r'
-SECRET_KEY = getenv("SECRET_KEY")
+SECRET_KEY = 'django-insecure-sew)_t!!zqaz37h8v0w4=&%a+2u_r=446=*^o#!%1-%v$l*c1r'
+#SECRET_KEY = getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv("IS_DEVELOPMENT", True)
 
 ALLOWED_HOSTS = [
-    getenv("APP_HOST")
+    "*"
 ]
 
 
@@ -81,8 +81,16 @@ WSGI_APPLICATION = 'sseyma.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'neondb',
+        'USER': 'neondb_owner',
+        'PASSWORD': 'npg_ueW2yMPFd8BZ',
+        'HOST': 'ep-sparkling-sunset-abrnj8ch-pooler.eu-west-2.aws.neon.tech',
+        'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+            'channel_binding': 'require',
+        }
     }
 }
 
