@@ -1,64 +1,116 @@
 {% extends "layout_admin.html" %}
 {% load static %}
 
-
-{% block css_file %} <link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">{% endblock css_file %}
-
+{% block title %}{{ ogrenci.ad_soyad }} | Düzenle{% endblock %}
 {% block content %}
+    <!-- Main Content -->
+    <div class="main-panel">
+        <div class="section-box">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{{ ogrenci.ad_soyad }} - Profili Düzenle</h2>
+                <a href="{% url 'ogrenci_detay' ogrenci.id %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                </a>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" class="student-edit-form">
+                {% csrf_token %}
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Ad Soyad</label>
+                        <input type="text" class="form-control" name="ad_soyad" value="{{ ogrenci.ad_soyad }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Seviye</label>
+                        <select class="form-select" name="seviye">
+                            {% for seviye in seviyeler %}
+                            <option value="{{ seviye.0 }}" {% if seviye.0 == ogrenci.seviye %}selected{% endif %}>
+                                {{ seviye.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Profil Fotoğrafı</label>
+                        <input type="file" class="form-control" name="profil_foto">
+                        {% if ogrenci.profil_foto %}
+                        <small class="text-muted d-block mt-1">Mevcut: {{ ogrenci.profil_foto.name|truncatechars:20 }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3 col-6">
+                        <label class="form-label">Mevcut Cüz</label>
+                        <input type="number" class="form-control" name="mevcut_cuz" value="{{ ogrenci.mevcut_cuz }}" min="1" max="30">
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <label class="form-label">Hedef Cüz</label>
+                        <input type="number" class="form-control" name="hedef_cuz" value="{{ ogrenci.hedef_cuz }}" min="1" max="30">
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <label class="form-label">Puan (1-10)</label>
+                        <input type="number" class="form-control" name="puan" value="{{ ogrenci.puan }}" min="1" max="10">
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Özel Notlar</label>
+                    <textarea class="form-control" name="ozel_notlar" rows="4">{{ ogrenci.ozel_notlar }}</textarea>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex">
+                    <button type="submit" class="btn btn-primary flex-grow-1 flex-md-grow-0 px-4 py-2">
+                        <i class="fas fa-save me-2"></i>Güncellemeleri Kaydet
+                    </button>
+                    <a href="{% url 'ogrenci_detay' ogrenci.id %}" class="btn btn-secondary flex-grow-1 flex-md-grow-0 px-4 py-2">
+                        İptal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-<div class="container py-4">
-    <h2>{{ ogrenci.ad_soyad }} - Profili Düzenle</h2>
-    
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Ad Soyad</label>
-                <input type="text" class="form-control" name="ad_soyad" value="{{ ogrenci.ad_soyad }}" required>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Seviye</label>
-                <select class="form-select" name="seviye">
-                    {% for seviye in seviyeler %}
-                    <option value="{{ seviye.0 }}" {% if seviye.0 == ogrenci.seviye %}selected{% endif %}>
-                        {{ seviye.1 }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Profil Fotoğrafı</label>
-                <input type="file" class="form-control" name="profil_foto">
-                {% if ogrenci.profil_foto %}
-                <small class="text-muted">Mevcut: {{ ogrenci.profil_foto.name }}</small>
-                {% endif %}
-            </div>
-        </div>
+    <style>
+        .student-edit-form {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
         
-        <div class="row mb-3">
-            <div class="col-md-3">
-                <label class="form-label">Mevcut Cüz</label>
-                <input type="number" class="form-control" name="mevcut_cuz" value="{{ ogrenci.mevcut_cuz }}" min="1" max="30">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Hedef Cüz</label>
-                <input type="number" class="form-control" name="hedef_cuz" value="{{ ogrenci.hedef_cuz }}" min="1" max="30">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Puan (1-100)</label>
-                <input type="number" class="form-control" name="puan" value="{{ ogrenci.puan }}" min="1" max="100">
-            </div>
-        </div>
+        @media (max-width: 768px) {
+            .student-edit-form .form-label {
+                font-size: 0.9rem;
+            }
+            
+            .student-edit-form .form-control,
+            .student-edit-form .form-select {
+                font-size: 0.9rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .student-edit-form .btn {
+                font-size: 0.9rem;
+                padding: 0.5rem;
+            }
+            
+            .section-box h2 {
+                font-size: 1.5rem;
+            }
+        }
         
-        <div class="mb-3">
-            <label class="form-label">Özel Notlar</label>
-            <textarea class="form-control" name="ozel_notlar" rows="3">{{ ogrenci.ozel_notlar }}</textarea>
-        </div>
-        
-        <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary btn-lg">Güncellemeleri Kaydet</button>
-            <a href="{% url 'ogrenci_detay' ogrenci.id %}" class="btn btn-secondary">İptal</a>
-        </div>
-    </form>
-</div>
+        @media (max-width: 576px) {
+            .student-edit-form .row.g-3 > div {
+                margin-bottom: 1rem;
+            }
+            
+            .student-edit-form .d-md-flex {
+                flex-direction: column;
+            }
+            
+            .student-edit-form .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
 {% endblock %}
