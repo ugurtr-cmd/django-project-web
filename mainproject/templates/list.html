@@ -2,44 +2,82 @@
 {% load static %}
 
 {% block title %}Yazı Yönetimi | Admin{% endblock %}
-{% block css_file %} <link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">{% endblock css_file %}
 {% block content %}
-<div class="container mt-4">
-  <h3 class="mb-3">📄 Tüm Yazılar</h3>
-  <table class="table table-striped table-hover">
-    <thead class="table-dark">
-      <tr>
-        <th>#</th>
-        <th>Başlık</th>
-        <th>Tarih</th>
-        <th>Durum</th>
-        <th>İşlem</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for yazi in yazilar %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ yazi.title|truncatechars:50 }}</td>
-        <td>{{ yazi.tarih|date:"d.m.Y" }}</td>
-        <td>
-          {% if yazi.isActive %}
-            <span class="badge bg-success">Aktif</span>
-          {% else %}
-            <span class="badge bg-secondary">Pasif</span>
-          {% endif %}
-        </td>
-        <td>
-          <a href="{% url "yazi-guncelle" yazi.id %}" class="btn btn-sm btn-primary">Güncelle</a>
-          <a href="{% url 'yazi-sil' yazi.id %}" class="btn btn-sm btn-danger">
-            Sil
-          </a>
-        </td>
-      </tr>
-      {% empty %}
-        <tr><td colspan="5" class="text-center">Hiç yazı yok.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+    <!-- Main Content -->
+    <div class="main-panel">
+        <!-- Yazı Yönetimi Bölümü -->
+        <div class="section-box">
+            <h4>📄 Tüm Yazılar</h4>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Başlık</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for yazi in yazilar %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ yazi.title|truncatechars:30 }}</td>
+                            <td>{{ yazi.tarih|date:"d.m.Y" }}</td>
+                            <td>
+                                {% if yazi.isActive %}
+                                    <span class="badge bg-success">Aktif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Pasif</span>
+                                {% endif %}
+                            </td>
+                            <td class="d-flex gap-2">
+                                <a href="{% url 'yazi-guncelle' yazi.id %}" class="btn btn-sm btn-primary flex-grow-1">Güncelle</a>
+                                <a href="{% url 'yazi-sil' yazi.id %}" class="btn btn-sm btn-danger flex-grow-1">
+                                    Sil
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center">Hiç yazı yok.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Özel stiller */
+        @media (max-width: 768px) {
+            .table-responsive table {
+                font-size: 0.9rem;
+            }
+            .table-responsive th, 
+            .table-responsive td {
+                padding: 0.5rem;
+            }
+            .table-responsive .btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+            }
+            .table-responsive td:nth-child(2) {  /* Başlık sütunu */
+                max-width: 150px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .table-responsive table {
+                min-width: 600px;
+            }
+        }
+    </style>
 {% endblock %}
