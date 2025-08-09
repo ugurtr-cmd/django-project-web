@@ -4,188 +4,191 @@
 {% block title %}Öğrenci Listesi | Admin{% endblock %}
 
 {% block content %}
-    <!-- Main Content -->
-    <div class="main-panel">
-        <div class="section-box">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3>🎓 Öğrenci Listesi</h3>
-                <a href="{% url 'ogrenci_ekle' %}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Yeni Öğrenci
-                </a>
-            </div>
-
-            <!-- Arama ve Filtreleme -->
-            <div class="row mb-4 g-3">
-                <div class="col-md-6">
-                    <input type="text" class="form-control" placeholder="Öğrenci ara...">
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select">
-                        <option selected>Tüm Seviyeler</option>
-                        <option>Başlangıç</option>
-                        <option>Orta</option>
-                        <option>İleri</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <button class="btn btn-outline-secondary w-100">
-                        <i class="fas fa-filter me-2"></i>Filtrele
-                    </button>
-                </div>
-            </div>
-
-            <!-- Öğrenci Tablosu -->
-            <div class="table-responsive-lg">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 50px;">#</th>
-                            <th>Öğrenci</th>
-                            <th style="width: 120px;">Seviye</th>
-                            <th style="width: 100px;">Mevcut Cüz</th>
-                            <th style="width: 100px;">Puan</th>
-                            <th style="width: 150px;">İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ogrenci in ogrenciler %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    {% if ogrenci.profil_foto %}
-                                    <img src="{{ ogrenci.profil_foto.url }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
-                                    {% else %}
-                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
-                                        <i class="fas fa-user text-muted"></i>
-                                    </div>
-                                    {% endif %}
-                                    <div>
-                                        <strong>{{ ogrenci.ad_soyad }}</strong>
-                                        <div class="text-muted small">{{ ogrenci.kayit_tarihi|date:"d.m.Y" }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge bg-{% if ogrenci.seviye == 'baslangic' %}info{% elif ogrenci.seviye == 'orta' %}warning{% else %}danger{% endif %}">
-                                    {{ ogrenci.get_seviye_display }}
-                                </span>
-                            </td>
-                            <td>{{ ogrenci.mevcut_cuz }}</td>
-                            <td>
-                                <div class="progress" style="height: 20px;">
-                                    <div class="progress-bar bg-success" 
-                                         style="width: {{ ogrenci.puan }}0%;"
-                                         role="progressbar" 
-                                         aria-valuenow="{{ ogrenci.puan }}" 
-                                         aria-valuemin="1" 
-                                         aria-valuemax="10">
-                                        {{ ogrenci.puan }}
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="{% url 'ogrenci_detay' ogrenci.id %}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{% url 'ogrenci_duzenle' ogrenci.id %}" class="btn btn-sm btn-outline-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{% url 'ogrenci_sil' ogrenci.id %}" class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
-                                <i class="fas fa-info-circle me-2"></i>Kayıtlı öğrenci bulunamadı
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Sayfalama -->
-            {% if ogrenciler.has_other_pages %}
-            <nav aria-label="Page navigation" class="mt-4">
-                <ul class="pagination justify-content-center">
-                    {% if ogrenciler.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?sayfa={{ ogrenciler.previous_page_number }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                    
-                    {% for i in ogrenciler.paginator.page_range %}
-                    <li class="page-item {% if ogrenciler.number == i %}active{% endif %}">
-                        <a class="page-link" href="?sayfa={{ i }}">{{ i }}</a>
-                    </li>
-                    {% endfor %}
-                    
-                    {% if ogrenciler.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?sayfa={{ ogrenciler.next_page_number }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-        </div>
+<div class="student-list-container">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+    <h2 class="mb-3 mb-md-0">
+      <i class="fas fa-users me-2"></i>Öğrenci Listesi
+    </h2>
+    <div class="d-flex gap-2">
+      <a href="{% url 'ogrenci_ekle' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Yeni Öğrenci
+      </a>
     </div>
+  </div>
 
-    <style>
-        /* Özel stiller */
-        .table-responsive-lg {
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
-        }
-        
-        .table th {
-            white-space: nowrap;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        .table td {
-            vertical-align: middle;
-        }
-        
-        .progress {
-            min-width: 60px;
-        }
-        
-        @media (max-width: 992px) {
-            .table-responsive-lg {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            .table {
-                min-width: 900px;
-            }
-            
-            .section-box h3 {
-                font-size: 1.5rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .d-flex.justify-content-between {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-        }
-    </style>
+  <!-- Filtreleme ve Arama -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <input type="text" class="form-control" placeholder="Öğrenci ara...">
+        </div>
+        <div class="col-md-4">
+          <select class="form-select">
+            <option selected>Tüm Seviyeler</option>
+            <option>Başlangıç</option>
+            <option>Orta</option>
+            <option>İleri</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-outline-primary w-100">
+            <i class="fas fa-search me-2"></i>Ara
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Öğrenci Listesi Tablosu -->
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 50px;">#</th>
+              <th>Öğrenci</th>
+              <th style="width: 120px;">Seviye</th>
+              <th style="width: 100px;">Cüz</th>
+              <th style="width: 120px;">Puan</th>
+              <th style="width: 150px;" class="text-end">İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ogrenci in ogrenciler %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>
+                <div class="d-flex align-items-center">
+                  {% if ogrenci.profil_foto %}
+                  <img src="{{ ogrenci.profil_foto.url }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+                  {% else %}
+                  <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
+                    <i class="fas fa-user text-muted"></i>
+                  </div>
+                  {% endif %}
+                  <div>
+                    <strong>{{ ogrenci.ad_soyad }}</strong>
+                    <div class="text-muted small">{{ ogrenci.kayit_tarihi|date:"d.m.Y" }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-{% if ogrenci.seviye == 'baslangic' %}info{% elif ogrenci.seviye == 'orta' %}warning{% else %}danger{% endif %}">
+                  {{ ogrenci.get_seviye_display }}
+                </span>
+              </td>
+              <td>{{ ogrenci.mevcut_cuz }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="progress flex-grow-1" style="height: 8px;">
+                    <div class="progress-bar bg-success" style="width: {{ ogrenci.puan }}0%;"></div>
+                  </div>
+                  <small>{{ ogrenci.puan }}/10</small>
+                </div>
+              </td>
+              <td class="text-end">
+                <div class="d-flex justify-content-end gap-2">
+                  <a href="{% url 'ogrenci_detay' ogrenci.id %}" class="btn btn-sm btn-outline-primary" title="Detay">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a href="{% url 'ogrenci_duzenle' ogrenci.id %}" class="btn btn-sm btn-outline-warning" title="Düzenle">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <a href="{% url 'ogrenci_sil' ogrenci.id %}" class="btn btn-sm btn-outline-danger" title="Sil">
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">
+                <i class="fas fa-info-circle me-2"></i>Kayıtlı öğrenci bulunamadı
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sayfalama -->
+  {% if ogrenciler.has_other_pages %}
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if ogrenciler.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?sayfa={{ ogrenciler.previous_page_number }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% endif %}
+      
+      {% for i in ogrenciler.paginator.page_range %}
+      <li class="page-item {% if ogrenciler.number == i %}active{% endif %}">
+        <a class="page-link" href="?sayfa={{ i }}">{{ i }}</a>
+      </li>
+      {% endfor %}
+      
+      {% if ogrenciler.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?sayfa={{ ogrenciler.next_page_number }}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+
+<style>
+  .student-list-container {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  @media (max-width: 992px) {
+    .student-list-container {
+      padding: 0 15px;
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .table {
+      min-width: 800px;
+    }
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .d-flex.flex-md-row {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .btn {
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .card-body {
+      padding: 1rem;
+    }
+    
+    .table td, .table th {
+      padding: 0.75rem 0.5rem;
+    }
+  }
+</style>
 {% endblock %}
