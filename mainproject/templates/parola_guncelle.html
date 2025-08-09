@@ -1,53 +1,82 @@
 {% extends "layout_admin.html" %}
 
 {% load static %}
-{% block title %}Yönetim Paneli | Şeyma {% endblock title %} 
-{% block css_file %} <link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">{% endblock css_file %}
+{% block title %}Parola Güncelleme | Şeyma {% endblock title %} 
 {% block content %}
     <!-- Main Content -->
     <div class="main-panel">
         {% include "messages.html" %}
 
-  <div class="login-container">
-    <div class="login-box">
-      <h2>Parola Güncelleme</h2>
-      {% if error %}
-        <div class="alert alert-danger">{{error}}</div>
-      
-      {% endif %}
-{% if form.errors %}
-  <div class="alert alert-danger">
-    {% for field in form %}
-      {% for error in field.errors %}
-        <p><strong>{{ field.label }}:</strong> {{ error }}</p>
-      {% endfor %}
-    {% endfor %}
-    {% for error in form.non_field_errors %}
-      <p>{{ error }}</p>
-    {% endfor %}
-  </div>
-{% endif %}
+        <div class="section-box">
+            <h4>🔒 Parola Güncelleme</h4>
+            
+            <div class="password-form-container">
+                {% if error %}
+                    <div class="alert alert-danger">{{error}}</div>
+                {% endif %}
+                
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <p><strong>{{ field.label }}:</strong> {{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-      <form method="POST">
-      {% csrf_token %}
-
-        <div class="mb-3">
-          <label for="old_password" class="form-label">Eski şifre</label>
-          <input type="password" name="old_password" class="form-control" id="old_password" placeholder="•••••••" required>
+                <form method="POST" class="password-form">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="old_password" class="form-label">Eski Şifre</label>
+                        <input type="password" name="old_password" class="form-control" id="old_password" placeholder="•••••••" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="new_password1" class="form-label">Yeni Şifre</label>
+                        <input type="password" name="new_password1" class="form-control" id="new_password1" placeholder="•••••••" required>
+                        <small class="form-text text-muted">En az 8 karakter, harf ve sayı içermelidir.</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="new_password2" class="form-label">Yeni Şifre (Tekrar)</label>
+                        <input type="password" name="new_password2" class="form-control" id="new_password2" placeholder="•••••••" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Şifreyi Güncelle</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="mb-3">
-          <label for="new_password" class="form-label">Yeni Şifre</label>
-          <input type="password" name="new_password1" class="form-control" id="new_password1" placeholder="•••••••" required>
-        </div>
-        <div class="mb-3">
-          <label for="new_password2" class="form-label">Yeni Şifre Tekrar</label>
-          <input type="password" name="new_password2" class="form-control" id="new_password2" placeholder="•••••••" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Güncelle</button>
-      </form>
     </div>
-  </div>
-     
-    </div>
 
+    <style>
+        .password-form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        
+        .password-form {
+            margin-top: 1.5rem;
+        }
+        
+        @media (max-width: 576px) {
+            .password-form-container {
+                padding: 1rem;
+            }
+            
+            .section-box {
+                padding: 1rem;
+            }
+        }
+    </style>
 {% endblock content %}
