@@ -1,89 +1,191 @@
 {% extends "layout_admin.html" %}
-
 {% load static %}
-{% block title %}Öğrenciler | Şeyma {% endblock title %} 
+
+{% block title %}Öğrenci Listesi | Admin{% endblock %}
+
 {% block content %}
     <!-- Main Content -->
     <div class="main-panel">
-        <!-- Öğrenci Bölümü -->
         <div class="section-box">
-            <h4>🎓 Öğrenciler</h4>
-            <div class="table-responsive">
-                <form class="row g-3 mb-4">
-                    <div class="col-md-4 col-12">
-                        <input type="text" class="form-control" placeholder="Ad Soyad">
-                    </div>
-                    <div class="col-md-2 col-6">
-                        <input type="number" class="form-control" placeholder="Not">
-                    </div>
-                    <div class="col-md-2 col-6">
-                        <input type="number" class="form-control" placeholder="Puan">
-                    </div>
-                    <div class="col-md-4 col-12">
-                        <button class="btn btn-success w-100">Öğrenci Ekle</button>
-                    </div>
-                </form>
-                
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Ad Soyad</th>
-                                <th>Not</th>
-                                <th>Puan</th>
-                                <th>İşlem</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Ahmet Demir</td>
-                                <td>85</td>
-                                <td>92</td>
-                                <td class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-warning flex-grow-1">Düzenle</button>
-                                    <button class="btn btn-sm btn-danger flex-grow-1">Sil</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Elif Kaya</td>
-                                <td>90</td>
-                                <td>95</td>
-                                <td class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-warning flex-grow-1">Düzenle</button>
-                                    <button class="btn btn-sm btn-danger flex-grow-1">Sil</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>🎓 Öğrenci Listesi</h3>
+                <a href="{% url 'ogrenci_ekle' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Yeni Öğrenci
+                </a>
+            </div>
+
+            <!-- Arama ve Filtreleme -->
+            <div class="row mb-4 g-3">
+                <div class="col-md-6">
+                    <input type="text" class="form-control" placeholder="Öğrenci ara...">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option selected>Tüm Seviyeler</option>
+                        <option>Başlangıç</option>
+                        <option>Orta</option>
+                        <option>İleri</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-filter me-2"></i>Filtrele
+                    </button>
                 </div>
             </div>
+
+            <!-- Öğrenci Tablosu -->
+            <div class="table-responsive-lg">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>Öğrenci</th>
+                            <th style="width: 120px;">Seviye</th>
+                            <th style="width: 100px;">Mevcut Cüz</th>
+                            <th style="width: 100px;">Puan</th>
+                            <th style="width: 150px;">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ogrenci in ogrenciler %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if ogrenci.profil_foto %}
+                                    <img src="{{ ogrenci.profil_foto.url }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+                                    {% else %}
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ ogrenci.ad_soyad }}</strong>
+                                        <div class="text-muted small">{{ ogrenci.kayit_tarihi|date:"d.m.Y" }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if ogrenci.seviye == 'baslangic' %}info{% elif ogrenci.seviye == 'orta' %}warning{% else %}danger{% endif %}">
+                                    {{ ogrenci.get_seviye_display }}
+                                </span>
+                            </td>
+                            <td>{{ ogrenci.mevcut_cuz }}</td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-success" 
+                                         style="width: {{ ogrenci.puan }}0%;"
+                                         role="progressbar" 
+                                         aria-valuenow="{{ ogrenci.puan }}" 
+                                         aria-valuemin="1" 
+                                         aria-valuemax="10">
+                                        {{ ogrenci.puan }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'ogrenci_detay' ogrenci.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'ogrenci_duzenle' ogrenci.id %}" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'ogrenci_sil' ogrenci.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="fas fa-info-circle me-2"></i>Kayıtlı öğrenci bulunamadı
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Sayfalama -->
+            {% if ogrenciler.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if ogrenciler.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?sayfa={{ ogrenciler.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for i in ogrenciler.paginator.page_range %}
+                    <li class="page-item {% if ogrenciler.number == i %}active{% endif %}">
+                        <a class="page-link" href="?sayfa={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if ogrenciler.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?sayfa={{ ogrenciler.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
         </div>
     </div>
 
     <style>
         /* Özel stiller */
-        @media (max-width: 768px) {
-            .table-responsive table {
-                font-size: 0.9rem;
-            }
-            .table-responsive th, 
-            .table-responsive td {
-                padding: 0.5rem;
-            }
-            .table-responsive .btn {
-                padding: 0.25rem 0.5rem;
-                font-size: 0.8rem;
-            }
+        .table-responsive-lg {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
         }
         
-        @media (max-width: 576px) {
-            .table-responsive {
+        .table th {
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .progress {
+            min-width: 60px;
+        }
+        
+        @media (max-width: 992px) {
+            .table-responsive-lg {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
-            .table-responsive table {
-                min-width: 600px;
+            
+            .table {
+                min-width: 900px;
+            }
+            
+            .section-box h3 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
             }
         }
     </style>
-{% endblock content %}
+{% endblock %}
