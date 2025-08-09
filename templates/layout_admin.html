@@ -4,22 +4,179 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}{% endblock title %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .admin-header {
+      background-color: #0d6efd;
+      color: white;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .admin-container {
+      display: flex;
+      flex-wrap: wrap;
+      min-height: calc(100vh - 150px);
+    }
+    
+    .sidebar {
+      flex: 0 0 250px;
+      background-color: white;
+      padding: 1.5rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      height: 100%;
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1rem;
+    }
+    
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .sidebar a {
+      padding: 0.75rem 1rem;
+      color: #333;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+    
+    .sidebar a:hover {
+      background-color: #f0f0f0;
+      color: #0d6efd;
+    }
+    
+    .main-panel {
+      flex: 1;
+      padding: 1.5rem;
+      background-color: white;
+      margin-left: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: margin-left 0.3s ease;
+    }
+    
+    .section-box {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+      margin-bottom: 1.5rem;
+    }
+    
+    .siteye-don {
+      display: block;
+      padding: 10px 15px;
+      margin-top: 20px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      color: #333;
+      text-decoration: none;
+      transition: all 0.3s;
+      border: 1px solid #dee2e6;
+    }
+    
+    .siteye-don:hover {
+      background-color: #e9ecef;
+      color: #0d6efd;
+    }
+    
+    .siteye-don i {
+      transition: transform 0.3s;
+    }
+    
+    .siteye-don:hover i {
+      transform: translateX(-3px);
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 992px) {
+      .sidebar {
+        position: fixed;
+        left: -250px;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+        width: 250px;
+        overflow-y: auto;
+      }
+      
+      .sidebar.active {
+        left: 0;
+      }
+      
+      .main-panel {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .menu-toggle {
+        display: block !important;
+      }
+    }
+    
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none;
+    }
+    
+    .overlay.active {
+      display: block;
+    }
+  </style>
   {% block css_file %}{% endblock css_file %}
 </head>
 <body>
   <div class="admin-header">
     <h1>ŞŞEYMA, hoş geldin.</h1>
     <p>Yönetim Paneline giriş yaptınız.</p>
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
   </div>
+  
+  <div class="overlay" id="overlay"></div>
+  
   {% include "messages.html" %}
 
   <div class="admin-container">
     <!-- Sidebar -->
-    <div class="sidebar text-center">
+    <div class="sidebar" id="sidebar">
       <img src="{% static 'blog/img/profil.jpg' %}" alt="Profil Foto">
       <h5>Şeyma</h5>
       <nav class="text-start">
@@ -37,38 +194,52 @@
       </nav>
     </div>
 
-    <style>
-  .siteye-don {
-    display: block;
-    padding: 10px 15px;
-    margin-top: 20px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    color: #333;
-    text-decoration: none;
-    transition: all 0.3s;
-    border: 1px solid #dee2e6;
-  }
-  
-  .siteye-don:hover {
-    background-color: #e9ecef;
-    color: #0d6efd;
-  }
-  
-  .siteye-don i {
-    transition: transform 0.3s;
-  }
-  
-  .siteye-don:hover i {
-    transform: translateX(-3px);
-  }
-</style>
-
     {% block content %}
     
     {% endblock content %}
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      
+      menuToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+        
+        // Menü ikonunu değiştir
+        const icon = menuToggle.querySelector('i');
+        if (sidebar.classList.contains('active')) {
+          icon.classList.remove('fa-bars');
+          icon.classList.add('fa-times');
+        } else {
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+      
+      overlay.addEventListener('click', function() {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        const icon = menuToggle.querySelector('i');
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      });
+      
+      // Ekran boyutu değiştiğinde kontrol et
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 992) {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+          const icon = menuToggle.querySelector('i');
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
