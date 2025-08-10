@@ -1,54 +1,93 @@
 {% extends "layout_admin.html" %}
-
 {% load static %}
-{% block title %}Yönetim Paneli | Şeyma {% endblock title %} 
-{% block css_file %} <link rel="stylesheet" href="{% static 'mainproject/css/admin.css' %}">{% endblock css_file %}
+
+{% block title %}Yeni Yazı Oluştur | Şeyma{% endblock %}
+
 {% block content %}
-
-    <!-- Main Content -->
-    <div class="main-panel">
-
-      <!-- Yazı Yazma Alanı -->
-      <div class="section-box">
-        <h4>📝 Yeni Yazı Oluştur</h4>
-        <form action="{% url "admin-paneli" %}" method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-          {% if error %}
-            <div class="alert alert-danger">{{msg}}</div>
-          {% endif %}
-          <div class="mb-3">
-            <label for="title" class="form-label">Başlık</label>
-            <input type="text" name="title" class="form-control" id="title" placeholder="Yazı başlığı">
-          </div>
-          <div class="mb-3">
-            <label for="content" class="form-label">İçerik</label>
-            <textarea class="form-control" name="description" id="editor" rows="4" placeholder="Yazı içeriğini buraya girin..."></textarea>
-          </div>
-          <div class="mb-3">
-            <label for="category" class="form-label">Kategori</label>
-            <select name="category" class="form-select" id="category">
-              {% for cat in kategoriler %}
-                <option value="{{ cat.id }}">{{ cat.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="imageUrl" class="form-label">Fotoğraf</label>
-            <input type="file" name="image" class="form-control" id="imageUrl">
-          </div>
-
-          <div class="form-check mb-3">
-            <input type="checkbox" name="isActive" class="form-check-input" checked>
-            <label for="isActive" name="isActive" class="form-check-label">Aktiflik</label>
-          </div>
-          <button class="btn btn-primary">Yayımla</button>
-        </form>
+<div class="main-panel">
+  <div class="section-box">
+    <h3 class="mb-4"><i class="fas fa-pen me-2"></i>Yeni Yazı Oluştur</h3>
+    
+    <form action="{% url 'admin-paneli' %}" method="POST" enctype="multipart/form-data" class="article-form">
+      {% csrf_token %}
+      {% if error %}
+        <div class="alert alert-danger">{{msg}}</div>
+      {% endif %}
+      
+      <div class="mb-4">
+        <label for="title" class="form-label">Başlık</label>
+        <input type="text" name="title" class="form-control" id="title" placeholder="Yazı başlığı" required>
       </div>
       
+      <div class="mb-4">
+        <label for="content" class="form-label">İçerik</label>
+        <textarea class="form-control" name="description" id="editor" rows="8" placeholder="Yazı içeriğini buraya girin..." required></textarea>
+      </div>
+      
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label for="category" class="form-label">Kategori</label>
+          <select name="category" class="form-select" id="category" required>
+            {% for cat in kategoriler %}
+              <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="col-md-6">
+          <label for="imageUrl" class="form-label">Fotoğraf</label>
+          <input type="file" name="image" class="form-control" id="imageUrl" accept="image/*">
+        </div>
+      </div>
+      
+      <div class="form-check form-switch mb-4">
+        <input class="form-check-input" type="checkbox" name="isActive" id="isActive" checked>
+        <label class="form-check-label" for="isActive">Yazıyı aktif olarak yayınla</label>
+      </div>
+      
+      <div class="d-flex justify-content-end gap-3">
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="fas fa-paper-plane me-2"></i>Yayımla
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 <script>
-    CKEDITOR.replace('editor');
+    CKEDITOR.replace('editor', {
+        width: '100%',
+        height: '300px',
+        toolbar: [
+            { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike'] },
+            { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Blockquote'] },
+            { name: 'links', items: ['Link', 'Unlink'] },
+            { name: 'insert', items: ['Image', 'Table'] },
+            { name: 'document', items: ['Source'] }
+        ]
+    });
 </script>
 
-{% endblock content %}
+<style>
+  .article-form {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 768px) {
+    .section-box {
+      padding: 1.5rem;
+    }
+    
+    .article-form .form-label {
+      font-size: 0.95rem;
+    }
+    
+    .article-form .form-control,
+    .article-form .form-select {
+      font-size: 0.95rem;
+    }
+  }
+</style>
+{% endblock %}
