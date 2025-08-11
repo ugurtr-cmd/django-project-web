@@ -20,13 +20,25 @@ class category(models.Model):
 class yazi(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
-    imageUrl = models.ImageField(upload_to='uploads', blank=True, null=True)
+    #imageUrl = models.ImageField(upload_to='uploads', blank=True, null=True)
     date = models.DateField(auto_now=True)
     isActive = models.BooleanField(default=True)
     slug = models.SlugField(default="", null=False,unique=True,db_index=True)
     tarih = models.DateTimeField(auto_now_add=True)
     category = models.ForeignKey(category,default=1, on_delete=models.CASCADE)
+    image = CloudinaryField(
+        'image', 
+        blank=True, 
+        null=True,
+        folder='blog_images/',
+        transformation={'quality': 'auto:good'},
+        format='webp'
+    )
     
+    # Eski imageUrl alanını kaldır veya comment out yap
+    # imageUrl = models.ImageField(upload_to='uploads', blank=True, null=True)
+    
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.title)
         super().save(args,kwargs)
