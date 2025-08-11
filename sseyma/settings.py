@@ -152,6 +152,23 @@ MESSAGE_TAGS = {
     message.ERROR: "alert-danger",
 }
 
+INSTALLED_APPS = [
+    # ...
+    'cloudinary',
+    'cloudinary_storage',
+    # ...
+]
+
+# Cloudinary konfigürasyonu
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dq7hvbvw9',
+    'API_KEY': '516366647721592',
+    'API_SECRET': '2h4zHhNu_ihFJ7QS__cy2gJ6IwU'
+}
+
+# Varsayılan dosya depolama olarak Cloudinary'i kullan
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # E-posta ayarları
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.com'  # Veya kendi SMTP sunucunuz
