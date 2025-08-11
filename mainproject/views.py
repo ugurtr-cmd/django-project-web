@@ -228,52 +228,70 @@ def admin_yazi_sil(request, id):
 def adminpanel(request):
     kategoriler = category.objects.all()
     msg = ""
+    
     if request.method == "POST":
-        title = request.POST["title"]
-        description = request.POST["description"]
-        imageUrl = request.FILES.get('image')
-        isActive = request.POST.get("isActive",False)
-
+        title = request.POST.get("title", "").strip()
+        description = request.POST.get("description", "").strip()
+        image_file = request.FILES.get('image')
+        isActive = request.POST.get("isActive", False)
+        category_id = request.POST.get("category")
+        
         isActive = True if isActive == "on" else False
 
-        if title == "":
-            msg+="Şeyma başlık girmek zorunlu"
-            return render(request, 'admin.html',{
-                    'error':True,
-                    'msg':msg,
-                    'kategoriler':kategoriler,}
-                  )
-        elif len(title) < 5 :
-            msg+="Şeyma sence de başlık çok kısa değil mi?"
-            return render(request, 'admin.html',{
-                    'error':True,
-                    'msg':msg,
-                    'kategoriler':kategoriler,}
-                  )
-        elif description == "":
-            msg+="Sence yazı içeriği olmadan paylaşım olur mu Şeyma?"
-            return render(request, 'admin.html',{
-                    'error':True,
-                    'msg':msg,
-                    'kategoriler':kategoriler,}
-                  )
-        elif len(description)<50:
-            msg+="Şeyma yazı çok mu kısa oldu ne"
-            return render(request, 'admin.html',{
-                    'error':True,
-                    'msg':msg,
-                    'kategoriler':kategoriler,}
-                  )
-
-        yazilar = yazi(title = title, description = description, imageUrl = imageUrl, isActive = isActive)
-        yazilar.save()
+        # Validasyonlar
+        errors = []
         
-        return redirect('/blog')
-        
-    return render(request, 'admin.html',{
-                  'kategoriler':kategoriler,}
-                  )
+        if not title:
+            errors.append("Başlık girmek zorunlu")
+        elif len(title) < 5:
+            errors.append("Başlık çok kısa (en az 5 karakter)")
+            
+        if not description:
+            errors.append("İçerik girmek zorunlu")
+        elif len(description) < 50:
+            errors.append("İçerik çok kısa (en az 50 karakter)")
+            
+        if not category_id:
+            errors.append("Kategori seçmek zorunlu")
+            
+        if errors:
+            return render(request, 'admin.html', {
+                'error': True,
+                'msg': "Şeyma, " + " | ".join(errors),
+                'kategoriler': kategoriler
+            })
 
+        try:
+            # Yeni yazı oluştur
+            yazilar = yazi(
+                title=title,
+                description=description,
+                isActive=isActive,
+                category_id=category_id
+            )
+            
+            # Cloudinary'e görsel yükleme
+            if image_file:
+                yazilar.image = image_file
+                
+            yazilar.save()
+            
+            messages.success(request, 'Yazı başarıyla kaydedildi!')
+            return redirect('admin-yazi-listesi')
+            
+        except Exception as e:
+            logger.error(f"Yazı kaydetme hatası: {str(e)}")
+            return render(request, 'admin.html', {
+                'error': True,
+                'msg': "Şeyma, bir hata oluştu: " + str(e),
+                'kategoriler': kategoriler
+            })
+    
+    return render(request, 'admin.html', {
+        'kategoriler': kategoriler,
+        'error': False
+    })
+    
 def login(request):
     if request.user.is_authenticated:
         return redirect('home')
