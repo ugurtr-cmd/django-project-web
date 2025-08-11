@@ -34,11 +34,19 @@
           </select>
         </div>
         
-        <div class="col-md-6">
-          <label for="imageUrl" class="form-label">Fotoğraf</label>
-          <input type="file" name="image" class="form-control" id="imageUrl" accept="image/*">
-        </div>
-      </div>
+       // <div class="col-md-6">
+      //   <label for="imageUrl" class="form-label">Fotoğraf</label>
+      //    <input type="file" name="image" class="form-control" id="imageUrl" accept="image/*">
+      //  </div>
+      // </div>
+
+      <div class="mb-4">
+      <label for="image" class="form-label">Fotoğraf</label>
+      <input type="file" name="image" class="form-control" id="image" accept="image/*">
+      <small class="text-muted">
+        Görsel Cloudinary'e yüklenecek ve optimize edilecektir
+      </small>
+    </div>
       
       <div class="form-check form-switch mb-4">
         <input class="form-check-input" type="checkbox" name="isActive" id="isActive" checked>
