@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
+from cloudinary.models import CloudinaryField
+
 # Create your models here.
 class SiteContent(models.Model):
     slug = models.SlugField(unique=True)  # örn: 'hakkimda', 'anasayfa-alt-metin'
