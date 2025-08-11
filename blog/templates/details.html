@@ -259,12 +259,11 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            {% if yazilar.imageUrl %}
-                <img 
-                    src="{{ yazilar.imageUrl.url }}" 
-                    class="article-image"
-                    alt="{{ yazilar.title }}"
-                >
+            {% if yazilar.image %}
+            <img src="{{ yazilar.image.url }}" 
+                 alt="{{ yazilar.title }}" 
+                 class="img-fluid mb-4"
+                 style="max-height: 400px; object-fit: cover;">
             {% endif %}
             
             <div class="article-content">
