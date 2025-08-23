@@ -149,41 +149,56 @@ def about(request):
 #         'yazilar':titlem
 #     })
 
+import requests
+from django.conf import settings
+
 def iletisim(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
+        # reCAPTCHA doğrulama
+        recaptcha_response = request.POST.get('g-recaptcha-response')
+        data = {
+            'secret': settings.RECAPTCHA_PRIVATE_KEY,
+            'response': recaptcha_response
+        }
+        r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
+        result = r.json()
         
-        # E-posta içeriğini daha düzenli hale getirme
-        subject = f"SEYMAA.COM -  Yeni İletişim Formu: {name}"
-        email_message = f"""
-        Ad Soyad: {name}
-        E-posta: {email}
-        
-        Mesaj:
-        {message}
-        
-        Bu mesaj {settings.SITE_NAME} iletişim formundan gönderilmiştir.
-        """
-        
-        try:
-            # Mail gönderiminden önce bilgileri kontrol et
+        # Eğer reCAPTCHA doğrulaması başarılıysa
+        if result['success']:
+            name = request.POST.get('name')
+            email = request.POST.get('email')
+            message = request.POST.get('message')
             
-            send_mail(
-                subject=subject,
-                message=email_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.CONTACT_EMAIL],
-                fail_silently=False,
-            )
-            messages.success(request, 'Mesajınız başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğim.')
-            return redirect('iletisim')
+            # E-posta içeriğini daha düzenli hale getirme
+            subject = f"SEYMAA.COM - Yeni İletişim Formu: {name}"
+            email_message = f"""
+            Ad Soyad: {name}
+            E-posta: {email}
             
-        except Exception as e:
-            error_msg = f"Mail gönderilemedi. Hata: {str(e)}"
-            print(error_msg)  # Konsola hata detayını yaz
-            messages.error(request, 'Mesajınız gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.')
+            Mesaj:
+            {message}
+            
+            Bu mesaj {settings.SITE_NAME} iletişim formundan gönderilmiştir.
+            """
+            
+            try:
+                # Mail gönderiminden önce bilgileri kontrol et
+                send_mail(
+                    subject=subject,
+                    message=email_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[settings.CONTACT_EMAIL],
+                    fail_silently=False,
+                )
+                messages.success(request, 'Mesajınız başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğim.')
+                return redirect('iletisim')
+                
+            except Exception as e:
+                error_msg = f"Mail gönderilemedi. Hata: {str(e)}"
+                print(error_msg)  # Konsola hata detayını yaz
+                messages.error(request, 'Mesajınız gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.')
+        else:
+            messages.error(request, 'Geçersiz reCAPTCHA. Lütfen tekrar deneyin.')
     
     return render(request, 'iletisim.html')
 
