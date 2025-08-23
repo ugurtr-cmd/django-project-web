@@ -152,56 +152,98 @@ def about(request):
 import requests
 from django.conf import settings
 
-def iletisim(request):
-    if request.method == 'POST':
-        # reCAPTCHA doğrulama
-        recaptcha_response = request.POST.get('g-recaptcha-response')
-        data = {
-            'secret': settings.RECAPTCHA_PRIVATE_KEY,
-            'response': recaptcha_response
-        }
-        r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
-        result = r.json()
-        
-        # Eğer reCAPTCHA doğrulaması başarılıysa
-        if result['success']:
-            name = request.POST.get('name')
-            email = request.POST.get('email')
-            message = request.POST.get('message')
-            
-            # E-posta içeriğini daha düzenli hale getirme
-            subject = f"SEYMAA.COM - Yeni İletişim Formu: {name}"
-            email_message = f"""
-            Ad Soyad: {name}
-            E-posta: {email}
-            
-            Mesaj:
-            {message}
-            
-            Bu mesaj {settings.SITE_NAME} iletişim formundan gönderilmiştir.
-            """
-            
-            try:
-                # Mail gönderiminden önce bilgileri kontrol et
-                send_mail(
-                    subject=subject,
-                    message=email_message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[settings.CONTACT_EMAIL],
-                    fail_silently=False,
-                )
-                messages.success(request, 'Mesajınız başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğim.')
-                return redirect('iletisim')
-                
-            except Exception as e:
-                error_msg = f"Mail gönderilemedi. Hata: {str(e)}"
-                print(error_msg)  # Konsola hata detayını yaz
-                messages.error(request, 'Mesajınız gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.')
-        else:
-            messages.error(request, 'Geçersiz reCAPTCHA. Lütfen tekrar deneyin.')
-    
-    return render(request, 'iletisim.html')
+import random
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import render, redirect
 
+def iletisim(request):
+    # Basit doğrulama sorusu oluştur
+    if 'verification_answer' not in request.session:
+        num1 = random.randint(1, 10)
+        num2 = random.randint(1, 10)
+        request.session['verification_answer'] = num1 + num2
+        request.session['verification_question'] = f"{num1} + {num2}"
+    
+    if request.method == 'POST':
+        # Form verilerini al
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        user_answer = request.POST.get('verification')
+        
+        # Doğrulama kontrolü
+        correct_answer = str(request.session.get('verification_answer', ''))
+        
+        if user_answer != correct_answer:
+            messages.error(request, 'Doğrulama hatası. Lütfen işlemin sonucunu doğru girin.')
+            # Yeni soru oluştur
+            num1 = random.randint(1, 10)
+            num2 = random.randint(1, 10)
+            request.session['verification_answer'] = num1 + num2
+            request.session['verification_question'] = f"{num1} + {num2}"
+            
+            # Form verilerini tekrar gösterilmek üzere session'a kaydet
+            request.session['form_data'] = {
+                'name': name,
+                'email': email,
+                'message': message
+            }
+            
+            return redirect('iletisim')
+            
+        # Doğrulama başarılıysa e-posta gönder
+        subject = f"SEYMAA.COM - Yeni İletişim Formu: {name}"
+        email_message = f"""
+        Ad Soyad: {name}
+        E-posta: {email}
+        
+        Mesaj:
+        {message}
+        
+        Bu mesaj SEYMAA.COM iletişim formundan gönderilmiştir.
+        """
+        
+        try:
+            # Doğrudan sabit e-posta adresi kullan
+            send_mail(
+                subject=subject,
+                message=email_message,
+                from_email='seymailetisim@yandex.com',  # Doğrudan sabit değer
+                recipient_list=['seymailetisim@yandex.com'],  # Doğrudan sabit değer
+                fail_silently=False,
+            )
+            messages.success(request, 'Mesajınız başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğim.')
+            
+            # Session'daki form verilerini temizle
+            if 'form_data' in request.session:
+                del request.session['form_data']
+                
+            # Yeni doğrulama sorusu oluştur
+            num1 = random.randint(1, 10)
+            num2 = random.randint(1, 10)
+            request.session['verification_answer'] = num1 + num2
+            request.session['verification_question'] = f"{num1} + {num2}"
+            
+            return redirect('iletisim')
+            
+        except Exception as e:
+            error_msg = f"Mail gönderilemedi. Hata: {str(e)}"
+            print(error_msg)  # Konsola hata detayını yaz
+            messages.error(request, 'Mesajınız gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.')
+    
+    # GET isteği veya doğrulama hatası sonrası
+    verification_question = request.session.get('verification_question', '2 + 3')
+    form_data = request.session.get('form_data', {})
+    
+    context = {
+        'verification_question': verification_question,
+        'form_data': form_data
+    }
+    
+    return render(request, 'iletisim.html', context)
+    
 # def slayt(request):
 #     return render(request, 'slayt.html')
 
