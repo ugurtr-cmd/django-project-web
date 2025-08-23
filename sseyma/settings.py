@@ -186,5 +186,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'seymailetisim@yandex.com'
 EMAIL_HOST_PASSWORD = 'qiakrilwxnueksos'
 DEFAULT_FROM_EMAIL = 'seymailetisim@yandex.com'
-CONTACT_EMAIL = 'ugurkezertr@gmail.com'  # Mesajların gideceği adres
+CONTACT_EMAIL = 'aydayhfz@gmail.com'  # Mesajların gideceği adres
 SITE_NAME = "seymaa.com"
