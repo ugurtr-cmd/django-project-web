@@ -167,33 +167,34 @@ def iletisim(request):
         request.session['verification_question'] = f"{num1} + {num2}"
     
     if request.method == 'POST':
-        # Form verilerini al
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        message = request.POST.get('message')
+        # Önce doğrulamayı kontrol et
         user_answer = request.POST.get('verification')
-        
-        # Doğrulama kontrolü
         correct_answer = str(request.session.get('verification_answer', ''))
         
         if user_answer != correct_answer:
             messages.error(request, 'Doğrulama hatası. Lütfen işlemin sonucunu doğru girin.')
+            
+            # Form verilerini tekrar gösterilmek üzere session'a kaydet
+            request.session['form_data'] = {
+                'name': request.POST.get('name'),
+                'email': request.POST.get('email'),
+                'message': request.POST.get('message')
+            }
+            
             # Yeni soru oluştur
             num1 = random.randint(1, 10)
             num2 = random.randint(1, 10)
             request.session['verification_answer'] = num1 + num2
             request.session['verification_question'] = f"{num1} + {num2}"
             
-            # Form verilerini tekrar gösterilmek üzere session'a kaydet
-            request.session['form_data'] = {
-                'name': name,
-                'email': email,
-                'message': message
-            }
-            
             return redirect('iletisim')
             
-        # Doğrulama başarılıysa e-posta gönder
+        # Doğrulama başarılıysa eski kodu çalıştır
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        
+        # E-posta içeriğini daha düzenli hale getirme
         subject = f"SEYMAA.COM - Yeni İletişim Formu: {name}"
         email_message = f"""
         Ad Soyad: {name}
@@ -202,16 +203,16 @@ def iletisim(request):
         Mesaj:
         {message}
         
-        Bu mesaj SEYMAA.COM iletişim formundan gönderilmiştir.
+        Bu mesaj {settings.SITE_NAME} iletişim formundan gönderilmiştir.
         """
         
         try:
-            # Doğrudan sabit e-posta adresi kullan
+            # Mail gönderiminden önce bilgileri kontrol et
             send_mail(
                 subject=subject,
                 message=email_message,
-                from_email='seymailetisim@yandex.com',  # Doğrudan sabit değer
-                recipient_list=['seymailetisim@yandex.com'],  # Doğrudan sabit değer
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.CONTACT_EMAIL],
                 fail_silently=False,
             )
             messages.success(request, 'Mesajınız başarıyla gönderildi! En kısa sürede sizinle iletişime geçeceğim.')
