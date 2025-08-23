@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-sew)_t!!zqaz37h8v0w4=&%a+2u_r=446=*^o#!%1-%v$l*c1r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["'www.seymaa.com"]
 
 
 # Application definition
