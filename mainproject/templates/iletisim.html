@@ -23,7 +23,10 @@
         font-size: 1.5rem;
         margin-right: 10px;
     }
-    .g-recaptcha {
+    .verification-box {
+        background-color: #e9ecef;
+        padding: 15px;
+        border-radius: 5px;
         margin-bottom: 20px;
     }
 </style>
@@ -35,6 +38,16 @@
         <div class="col-lg-10">
             <h2 class="section-title text-center mb-4"><i class="fas fa-envelope me-2"></i>İletişim</h2>
             
+            <!-- Mesajlar -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
             <div class="row">
                 <div class="col-md-7 mb-4">
                     <div class="contact-form">
@@ -42,19 +55,27 @@
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="name" class="form-label">Adınız Soyadınız</label>
-                                <input type="text" class="form-control" id="name" name="name" required>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ form_data.name }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">E-posta Adresiniz</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ form_data.email }}" required>
                             </div>
                             <div class="mb-3">
                                 <label for="message" class="form-label">Mesajınız</label>
-                                <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                                <textarea class="form-control" id="message" name="message" rows="5" required>{{ form_data.message }}</textarea>
                             </div>
                             
-                            <!-- reCAPTCHA Widget -->
-                            <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_PUBLIC_KEY }}"></div>
+                            <!-- Doğrulama Kutusu -->
+                            <div class="verification-box mb-3">
+                                <h5><i class="fas fa-shield-alt me-2"></i>Güvenlik Doğrulaması</h5>
+                                <p>Lütfen aşağıdaki işlemin sonucunu giriniz:</p>
+                                <div class="d-flex align-items-center">
+                                    <span class="fs-4 fw-bold me-2">{{ verification_question }} =</span>
+                                    <input type="text" class="form-control w-25" id="verification" name="verification" required>
+                                </div>
+                                <div class="form-text">Bu işlem spam mesajları önlemek içindir.</div>
+                            </div>
                             
                             <button type="submit" class="btn btn-primary w-100 py-2">
                                 <i class="fas fa-paper-plane me-2"></i>Gönder
@@ -94,8 +115,3 @@
     </div>
 </div>
 {% endblock %}
-
-
-<!-- reCAPTCHA API -->
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
