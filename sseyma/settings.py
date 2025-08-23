@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from os import getenv
+import os
 from django.contrib.messages import constants as message
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,13 +22,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-sew)_t!!zqaz37h8v0w4=&%a+2u_r=446=*^o#!%1-%v$l*c1r'
-#SECRET_KEY = getenv("SECRET_KEY")
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = getenv("IS_DEVELOPMENT", True)
 
-ALLOWED_HOSTS = [
-    "*"
-]
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -40,8 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary',
-    'cloudinary_storage',
     'mainproject',
     'blog',
 ]
@@ -83,16 +79,8 @@ WSGI_APPLICATION = 'sseyma.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'neondb',
-        'USER': 'neondb_owner',
-        'PASSWORD': 'npg_ueW2yMPFd8BZ',
-        'HOST': 'ep-sparkling-sunset-abrnj8ch-pooler.eu-west-2.aws.neon.tech',
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'require',
-            'channel_binding': 'require',
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -131,11 +119,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    #os.path.join(BASE_DIR, 'static'),
-    #BASE_DIR / 'static/',
+    BASE_DIR / 'static/',
 ]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "uploads"
@@ -153,23 +139,6 @@ MESSAGE_TAGS = {
     message.WARNING: "alert-warning",
     message.ERROR: "alert-danger",
 }
-
-INSTALLED_APPS = [
-    # ...
-    'cloudinary',
-    'cloudinary_storage',
-    # ...
-]
-
-# Cloudinary konfigürasyonu
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dq7hvbvw9',
-    'API_KEY': '516366647721592',
-    'API_SECRET': '2h4zHhNu_ihFJ7QS__cy2gJ6IwU'
-}
-
-# Varsayılan dosya depolama olarak Cloudinary'i kullan
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # E-posta ayarları
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
